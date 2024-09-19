@@ -1,3 +1,3 @@
-# ros2-project-template
+# autoware_ros2_whill_adapter
 
-Project template for ROS 2
+[WIP] This is an adapter package that connects Autoware and ros2_whill.
