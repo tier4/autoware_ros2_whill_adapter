@@ -53,10 +53,9 @@ void AutowareRos2WhillReceiver::onWhillStates(const whill_msgs::msg::ModelCr2Sta
 {
   const auto now_stamp = this->now();
 
-  // Left motor outputs negative value when the vehicle moving forward.
-
+  // Right motor outputs negative value when the vehicle moving forward.
   tier4_debug_msgs::msg::Float32Stamped velocity_kmph_msg;
-  velocity_kmph_msg.data = (msg->right_motor_speed - msg->left_motor_speed) / 2;
+  velocity_kmph_msg.data = (msg->left_motor_speed - msg->right_motor_speed) / 2;
   velocity_kmph_msg.stamp = now_stamp;
   velocity_kmph_status_pub_->publish(velocity_kmph_msg);
 
@@ -64,7 +63,7 @@ void AutowareRos2WhillReceiver::onWhillStates(const whill_msgs::msg::ModelCr2Sta
   twist.header.stamp = now_stamp;
   twist.header.frame_id = "base_link";
   twist.longitudinal_velocity = velocity_kmph_msg.data / 3.6;
-  twist.heading_rate = (msg->right_motor_speed + msg->left_motor_speed) / 3.6 / wheel_tread_;
+  twist.heading_rate = (msg->right_motor_speed + msg->left_motor_speed) / -3.6 / wheel_tread_;
   velocity_status_pub_->publish(twist);
 
   autoware_auto_vehicle_msgs::msg::SteeringReport steer_msg;
