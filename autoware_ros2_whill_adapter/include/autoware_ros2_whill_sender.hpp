@@ -43,6 +43,7 @@ private:
   // Variables
   bool is_emergency_{false};
   double control_cmd_timeout_sec_;
+  double vehicle_velocity_limit_;
   autoware_auto_control_msgs::msg::AckermannControlCommand::ConstSharedPtr control_cmd_ptr_;
   autoware_auto_vehicle_msgs::msg::GearCommand::ConstSharedPtr gear_cmd_ptr_;
 
