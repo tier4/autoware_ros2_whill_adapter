@@ -47,6 +47,8 @@ AutowareRos2WhillReceiver::AutowareRos2WhillReceiver(const rclcpp::NodeOptions &
     "/vehicle/status/velocity_kmph", 1);
   steering_wheel_deg_status_pub_ = this->create_publisher<tier4_debug_msgs::msg::Float32Stamped>(
     "/vehicle/status/steering_wheel_deg", 1);
+
+  setupDiagnosticUpdater();
 }
 
 void AutowareRos2WhillReceiver::onWhillStates(const whill_msgs::msg::ModelCr2State::ConstSharedPtr msg)
@@ -80,6 +82,8 @@ void AutowareRos2WhillReceiver::onWhillStates(const whill_msgs::msg::ModelCr2Sta
   steering_wheel_deg_status_pub_->publish(steer_wheel_deg_msg);
 
   publishStaticTopics();
+  err_code_ = msg->error;
+  diagnostic_updater_.force_update();
 }
 
 void AutowareRos2WhillReceiver::publishStaticTopics()

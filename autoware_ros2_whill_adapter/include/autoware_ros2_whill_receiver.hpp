@@ -15,6 +15,7 @@
 #ifndef AUTOWARE_ROS2_WHILL_RECEIVER__AUTOWARE_ROS2_WHILL_RECEIVER_HPP_
 #define AUTOWARE_ROS2_WHILL_RECEIVER__AUTOWARE_ROS2_WHILL_RECEIVER_HPP_
 
+#include "diagnostic_updater/diagnostic_updater.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include "autoware_auto_vehicle_msgs/msg/control_mode_report.hpp"
@@ -46,6 +47,12 @@ private:
 
   // Functions
   void publishStaticTopics();
+
+  // Diagnostics
+  int err_code_;
+  void setupDiagnosticUpdater();
+  void checkErrCode(diagnostic_updater::DiagnosticStatusWrapper & stat);
+  diagnostic_updater::Updater diagnostic_updater_{this};
 
   // Callbacks
   void onWhillStates(const whill_msgs::msg::ModelCr2State::ConstSharedPtr msg);
