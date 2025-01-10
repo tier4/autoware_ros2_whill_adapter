@@ -27,6 +27,7 @@ AutowareRos2WhillSender::AutowareRos2WhillSender(const rclcpp::NodeOptions & nod
 
   control_cmd_timeout_sec_ = declare_parameter<double>("control_cmd_timeout_sec", 0.5);
   loop_rate_ = declare_parameter<double>("loop_rate", 50.0);
+  vehicle_velocity_limit_ = declare_parameter<double>("vehicle_velocity_limit", 1.67);
 
   // Subscribe from Autoware
   control_cmd_sub_ =
@@ -70,7 +71,12 @@ void AutowareRos2WhillSender::onTimer()
   if (!isCmdTimeout() && gear_cmd_ptr_->command != GearCommand::PARK && !is_emergency_)
   {
     cmd_twist.linear.x = control_cmd_ptr_->longitudinal.speed;
-    cmd_twist.angular.z = control_cmd_ptr_->longitudinal.speed * std::tan(control_cmd_ptr_->lateral.steering_tire_angle) / wheel_base_;
+    if (cmd_twist.linear.x > vehicle_velocity_limit_) {
+    cmd_twist.linear.x = vehicle_velocity_limit_;
+    RCLCPP_ERROR_THROTTLE(
+          this->get_logger(), *get_clock(), 1000, "error: input command over the limit velocity(%f[m/s]), limit to %f[m/s]", control_cmd_ptr_->longitudinal.speed, vehicle_velocity_limit_);
+  }
+    cmd_twist.angular.z = cmd_twist.linear.x * std::tan(control_cmd_ptr_->lateral.steering_tire_angle) / wheel_base_;
     RCLCPP_INFO(this->get_logger(), "Publish Command: linear:['%f'] angular:['%f']", cmd_twist.linear.x, cmd_twist.angular.z);
   }
   else if (is_emergency_)
