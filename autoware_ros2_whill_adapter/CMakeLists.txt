@@ -16,6 +16,7 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(autoware_ros2_whill_receiver_node SHARED
   src/autoware_ros2_whill_receiver.cpp
+  src/autoware_ros2_whill_adapter_diagnostic.cpp
 )
 rclcpp_components_register_node(autoware_ros2_whill_receiver_node
   PLUGIN "AutowareRos2WhillReceiver"
