@@ -20,7 +20,7 @@ AutowareRos2WhillSender::AutowareRos2WhillSender(const rclcpp::NodeOptions & nod
   using std::placeholders::_1;
 
   // Parameters
-  const auto vehicle_info = vehicle_info_util::VehicleInfoUtil(*this).getVehicleInfo();
+  const auto vehicle_info = autoware::vehicle_info_utils::VehicleInfoUtils(*this).getVehicleInfo();
   wheel_base_ = vehicle_info.wheel_base_m;
   wheel_tread_ = vehicle_info.wheel_tread_m;
   wheel_radius_ = vehicle_info.wheel_radius_m;

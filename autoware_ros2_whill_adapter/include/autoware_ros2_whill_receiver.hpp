@@ -30,7 +30,7 @@
 #include "tier4_vehicle_msgs/msg/battery_status.hpp"
 #include "tier4_vehicle_msgs/msg/vehicle_emergency_stamped.hpp"
 
-#include "vehicle_info_util/vehicle_info_util.hpp"
+#include "autoware_vehicle_info_utils/vehicle_info_utils.hpp"
 
 #include "whill_msgs/msg/model_cr2_state.hpp"
 
