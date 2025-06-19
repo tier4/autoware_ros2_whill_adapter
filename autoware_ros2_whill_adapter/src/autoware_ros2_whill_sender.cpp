@@ -31,16 +31,16 @@ AutowareRos2WhillSender::AutowareRos2WhillSender(const rclcpp::NodeOptions & nod
 
   // Subscribe from Autoware
   control_cmd_sub_ =
-    this->create_subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>(
+    this->create_subscription<autoware_control_msgs::msg::Control>(
       "/control/command/control_cmd", 1,
       std::bind(&AutowareRos2WhillSender::onAckermannControlCmd, this, _1));
-  gear_cmd_sub_ = this->create_subscription<autoware_auto_vehicle_msgs::msg::GearCommand>(
+  gear_cmd_sub_ = this->create_subscription<autoware_vehicle_msgs::msg::GearCommand>(
     "/control/command/gear_cmd", 1, std::bind(&AutowareRos2WhillSender::onGearCmd, this, _1));
   emergency_sub_ = create_subscription<tier4_vehicle_msgs::msg::VehicleEmergencyStamped>(
     "/control/command/emergency_cmd", 1, std::bind(&AutowareRos2WhillSender::onEmergencyCmd, this, _1));
 
   // Publish to Autoware
-  gear_status_pub_ = this->create_publisher<autoware_auto_vehicle_msgs::msg::GearReport>(
+  gear_status_pub_ = this->create_publisher<autoware_vehicle_msgs::msg::GearReport>(
     "/vehicle/status/gear_status", 1);
   // Publish to ros2_whill
   whill_twist_pub_ = this->create_publisher<geometry_msgs::msg::Twist>(
@@ -64,17 +64,17 @@ void AutowareRos2WhillSender::onTimer()
     return;
   }
 
-  using autoware_auto_vehicle_msgs::msg::GearCommand;
+  using autoware_vehicle_msgs::msg::GearCommand;
 
   geometry_msgs::msg::Twist cmd_twist;
 
   if (!isCmdTimeout() && gear_cmd_ptr_->command != GearCommand::PARK && !is_emergency_)
   {
-    cmd_twist.linear.x = control_cmd_ptr_->longitudinal.speed;
+    cmd_twist.linear.x = control_cmd_ptr_->longitudinal.velocity;
     if (cmd_twist.linear.x > vehicle_velocity_limit_) {
     cmd_twist.linear.x = vehicle_velocity_limit_;
     RCLCPP_ERROR_THROTTLE(
-          this->get_logger(), *get_clock(), 1000, "error: input command over the limit velocity(%f[m/s]), limit to %f[m/s]", control_cmd_ptr_->longitudinal.speed, vehicle_velocity_limit_);
+          this->get_logger(), *get_clock(), 1000, "error: input command over the limit velocity(%f[m/s]), limit to %f[m/s]", control_cmd_ptr_->longitudinal.velocity, vehicle_velocity_limit_);
   }
     cmd_twist.angular.z = cmd_twist.linear.x * std::tan(control_cmd_ptr_->lateral.steering_tire_angle) / wheel_base_;
     RCLCPP_INFO(this->get_logger(), "Publish Command: linear:['%f'] angular:['%f']", cmd_twist.linear.x, cmd_twist.angular.z);
@@ -108,15 +108,15 @@ bool AutowareRos2WhillSender::isCmdTimeout()
 }
 
 void AutowareRos2WhillSender::onAckermannControlCmd(
-  const autoware_auto_control_msgs::msg::AckermannControlCommand::ConstSharedPtr msg)
+  const autoware_control_msgs::msg::Control::ConstSharedPtr msg)
 {
   control_cmd_ptr_ = msg;
 }
 
-void AutowareRos2WhillSender::onGearCmd(const autoware_auto_vehicle_msgs::msg::GearCommand::ConstSharedPtr msg)
+void AutowareRos2WhillSender::onGearCmd(const autoware_vehicle_msgs::msg::GearCommand::ConstSharedPtr msg)
 {
-  using autoware_auto_vehicle_msgs::msg::GearCommand;
-  using autoware_auto_vehicle_msgs::msg::GearReport;
+  using autoware_vehicle_msgs::msg::GearCommand;
+  using autoware_vehicle_msgs::msg::GearReport;
 
   gear_cmd_ptr_ = msg;
   auto report_msg = GearReport{};

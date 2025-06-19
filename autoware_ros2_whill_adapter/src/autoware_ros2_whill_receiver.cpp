@@ -30,18 +30,18 @@ AutowareRos2WhillReceiver::AutowareRos2WhillReceiver(const rclcpp::NodeOptions &
     "/whill/states/model_cr2", 1, std::bind(&AutowareRos2WhillReceiver::onWhillStates, this, _1));
 
   // Publish to autoware
-  velocity_status_pub_ = this->create_publisher<autoware_auto_vehicle_msgs::msg::VelocityReport>(
+  velocity_status_pub_ = this->create_publisher<autoware_vehicle_msgs::msg::VelocityReport>(
     "/vehicle/status/velocity_status", 1);
-  steering_status_pub_ = this->create_publisher<autoware_auto_vehicle_msgs::msg::SteeringReport>(
+  steering_status_pub_ = this->create_publisher<autoware_vehicle_msgs::msg::SteeringReport>(
     "/vehicle/status/steering_status", 1);
   turn_indicators_status_pub_ =
-    this->create_publisher<autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport>(
+    this->create_publisher<autoware_vehicle_msgs::msg::TurnIndicatorsReport>(
       "/vehicle/status/turn_indicators_status", 1);
   hazard_lights_status_pub_ =
-    this->create_publisher<autoware_auto_vehicle_msgs::msg::HazardLightsReport>(
+    this->create_publisher<autoware_vehicle_msgs::msg::HazardLightsReport>(
       "/vehicle/status/hazard_lights_status", 1);
   control_mode_status_pub_ =
-    this->create_publisher<autoware_auto_vehicle_msgs::msg::ControlModeReport>(
+    this->create_publisher<autoware_vehicle_msgs::msg::ControlModeReport>(
       "/vehicle/status/control_mode", 1);
   velocity_kmph_status_pub_ = this->create_publisher<tier4_debug_msgs::msg::Float32Stamped>(
     "/vehicle/status/velocity_kmph", 1);
@@ -61,14 +61,14 @@ void AutowareRos2WhillReceiver::onWhillStates(const whill_msgs::msg::ModelCr2Sta
   velocity_kmph_msg.stamp = now_stamp;
   velocity_kmph_status_pub_->publish(velocity_kmph_msg);
 
-  autoware_auto_vehicle_msgs::msg::VelocityReport twist;
+  autoware_vehicle_msgs::msg::VelocityReport twist;
   twist.header.stamp = now_stamp;
   twist.header.frame_id = "base_link";
   twist.longitudinal_velocity = velocity_kmph_msg.data / 3.6;
   twist.heading_rate = (msg->right_motor_speed + msg->left_motor_speed) / -3.6 / wheel_tread_;
   velocity_status_pub_->publish(twist);
 
-  autoware_auto_vehicle_msgs::msg::SteeringReport steer_msg;
+  autoware_vehicle_msgs::msg::SteeringReport steer_msg;
   steer_msg.stamp = now_stamp;
   steer_msg.steering_tire_angle =
     twist.longitudinal_velocity != 0.0
@@ -91,19 +91,19 @@ void AutowareRos2WhillReceiver::publishStaticTopics()
   const auto now_stamp = this->now();
 
   // WIP
-  using autoware_auto_vehicle_msgs::msg::ControlModeReport;
+  using autoware_vehicle_msgs::msg::ControlModeReport;
   ControlModeReport control_mode_report;
   control_mode_report.stamp = now_stamp;
   control_mode_report.mode = ControlModeReport::AUTONOMOUS;
   control_mode_status_pub_->publish(control_mode_report);
 
-  using autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
+  using autoware_vehicle_msgs::msg::TurnIndicatorsReport;
   TurnIndicatorsReport turn_indicator_report;
   turn_indicator_report.stamp = now_stamp;
   turn_indicator_report.report = TurnIndicatorsReport::DISABLE;
   turn_indicators_status_pub_->publish(turn_indicator_report);
 
-  using autoware_auto_vehicle_msgs::msg::HazardLightsReport;
+  using autoware_vehicle_msgs::msg::HazardLightsReport;
   HazardLightsReport hazard_light_report;
   hazard_light_report.stamp = now_stamp;
   hazard_light_report.report =HazardLightsReport::DISABLE;
