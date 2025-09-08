@@ -17,13 +17,13 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-#include "autoware_auto_control_msgs/msg/ackermann_control_command.hpp"
-#include "autoware_auto_vehicle_msgs/msg/gear_command.hpp"
-#include "autoware_auto_vehicle_msgs/msg/gear_report.hpp"
+#include "autoware_control_msgs/msg/control.hpp"
+#include "autoware_vehicle_msgs/msg/gear_command.hpp"
+#include "autoware_vehicle_msgs/msg/gear_report.hpp"
 
 #include "tier4_vehicle_msgs/msg/vehicle_emergency_stamped.hpp"
 
-#include "vehicle_info_util/vehicle_info_util.hpp"
+#include "autoware_vehicle_info_utils/vehicle_info_utils.hpp"
 
 #include "geometry_msgs/msg/twist.hpp"
 
@@ -44,8 +44,8 @@ private:
   bool is_emergency_{false};
   double control_cmd_timeout_sec_;
   double vehicle_velocity_limit_;
-  autoware_auto_control_msgs::msg::AckermannControlCommand::ConstSharedPtr control_cmd_ptr_;
-  autoware_auto_vehicle_msgs::msg::GearCommand::ConstSharedPtr gear_cmd_ptr_;
+  autoware_control_msgs::msg::Control::ConstSharedPtr control_cmd_ptr_;
+  autoware_vehicle_msgs::msg::GearCommand::ConstSharedPtr gear_cmd_ptr_;
 
   rclcpp::TimerBase::SharedPtr cmd_timer_;
   double loop_rate_;
@@ -56,18 +56,18 @@ private:
 
   // Callbacks
   void onAckermannControlCmd(
-    const autoware_auto_control_msgs::msg::AckermannControlCommand::ConstSharedPtr msg);
-  void onGearCmd(const autoware_auto_vehicle_msgs::msg::GearCommand::ConstSharedPtr msg);
+    const autoware_control_msgs::msg::Control::ConstSharedPtr msg);
+  void onGearCmd(const autoware_vehicle_msgs::msg::GearCommand::ConstSharedPtr msg);
   void onEmergencyCmd(const tier4_vehicle_msgs::msg::VehicleEmergencyStamped::ConstSharedPtr msg);
 
   // Subscrib from Autoware
-  rclcpp::Subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>::SharedPtr
+  rclcpp::Subscription<autoware_control_msgs::msg::Control>::SharedPtr
     control_cmd_sub_;
-  rclcpp::Subscription<autoware_auto_vehicle_msgs::msg::GearCommand>::SharedPtr gear_cmd_sub_;
+  rclcpp::Subscription<autoware_vehicle_msgs::msg::GearCommand>::SharedPtr gear_cmd_sub_;
   rclcpp::Subscription<tier4_vehicle_msgs::msg::VehicleEmergencyStamped>::SharedPtr emergency_sub_;
 
   // Publish to Autoware
-  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::GearReport>::SharedPtr gear_status_pub_;
+  rclcpp::Publisher<autoware_vehicle_msgs::msg::GearReport>::SharedPtr gear_status_pub_;
   // Publish to ros2_whill
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr whill_twist_pub_;
 
